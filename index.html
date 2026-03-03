@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure DevOps - Project Alpha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .ms-login-card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.14);
+            max-width: 440px;
+            width: 100%;
+        }
+
+        .ms-button-primary {
+            background-color: #0067b8;
+            color: white;
+        }
+
+        .ms-button-primary:hover {
+            background-color: #005da6;
+        }
+
+        .sidebar-item-active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #60a5fa;
+        }
+
+        .chart-container {
+            position: relative;
+        }
+
+        /* Hide views by default */
+        .view-hidden {
+            display: none !important;
+        }
+
+        /* Custom Scrollbar for Microsoft look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- SIGN IN PAGE VIEW -->
+    <div id="auth-view" class="h-screen w-full flex items-center justify-center bg-[#f2f2f2]">
+        <div class="ms-login-card bg-white p-11 rounded-sm">
+            <div class="flex items-center gap-1 mb-4">
+                <div class="grid grid-cols-2 gap-0.5">
+                    <div class="w-2.5 h-2.5 bg-[#f25022]"></div>
+                    <div class="w-2.5 h-2.5 bg-[#7fba00]"></div>
+                    <div class="w-2.5 h-2.5 bg-[#00a4ef]"></div>
+                    <div class="w-2.5 h-2.5 bg-[#ffb900]"></div>
+                </div>
+                <span class="text-[#737373] text-xl font-semibold ml-2">Microsoft</span>
+            </div>
+            
+            <h1 class="text-2xl font-semibold mb-2">Sign in</h1>
+            <p class="text-sm mb-4">to continue to Azure DevOps</p>
+            
+            <input type="text" placeholder="Email, phone, or Skype" class="w-full border-b border-black py-2 mb-6 focus:outline-none focus:border-[#0067b8] transition-all" value="devops-admin@microsoft.com">
+            
+            <div class="text-xs mb-8">
+                No account? <a href="#" class="text-[#0067b8] hover:underline">Create one!</a>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button id="login-btn" class="ms-button-primary px-9 py-1.5 text-sm font-semibold">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP VIEW -->
+    <div id="app-view" class="view-hidden flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-[#252525] text-white flex flex-col shrink-0">
+            <div class="p-4 flex items-center gap-3 border-b border-white/10">
+                <div class="w-8 h-8 bg-blue-500 rounded flex items-center justify-center font-bold">AZ</div>
+                <span class="font-semibold tracking-tight">Azure DevOps</span>
+            </div>
+            
+            <nav class="flex-1 py-4">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-6 py-3 transition-colors sidebar-item-active">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
+                    <span class="text-sm font-medium">Overview</span>
+                </button>
+                <button onclick="switchTab('boards')" id="tab-boards" class="w-full flex items-center gap-3 px-6 py-3 transition-colors text-slate-400 hover:bg-white/5">
+                    <i data-lucide="list-todo" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Boards</span>
+                </button>
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="w-full flex items-center gap-3 px-6 py-3 transition-colors text-slate-400 hover:bg-white/5">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    <span class="text-sm font-medium">Analytics</span>
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-white/10 space-y-4">
+                <div class="flex items-center gap-3 text-slate-400 hover:text-white cursor-pointer px-2 text-sm">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Project Settings</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+                <div class="flex items-center gap-2 text-sm text-slate-500">
+                    <span>Microsoft</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    <span class="font-medium text-slate-800 uppercase tracking-wider">DevOps Project Alpha</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        LIVE SPRINT
+                    </div>
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">AD</div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8" id="content-scroll">
+                <div class="max-w-6xl mx-auto space-y-8">
+                    
+                    <!-- Dashboard Content -->
+                    <div id="view-dashboard" class="space-y-8">
+                        <div class="flex items-center justify-between">
+                            <h1 class="text-2xl font-bold text-slate-800">Project Overview</h1>
+                            <p class="text-sm text-slate-500">Real-time telemetry active</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="stats-container">
+                            <!-- Stats injected via JS -->
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2 bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                                <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-2">
+                                    <i data-lucide="trending-up" class="w-4 h-4 text-blue-600"></i>
+                                    <h3 class="font-semibold text-slate-700">Project Health Analysis</h3>
+                                </div>
+                                <div class="p-4 space-y-4">
+                                    <div id="analysis-feedback" class="p-4 bg-slate-50 border-l-4 border-blue-500 rounded text-slate-700 italic font-medium"></div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="p-3 border border-slate-100 rounded-lg">
+                                            <h4 class="text-[10px] font-bold text-slate-400 mb-1 uppercase">Dominant Resource</h4>
+                                            <p id="analysis-focus" class="text-lg font-bold text-slate-700">-</p>
+                                        </div>
+                                        <div class="p-3 border border-slate-100 rounded-lg">
+                                            <h4 class="text-[10px] font-bold text-slate-400 mb-1 uppercase">Completion Rate</h4>
+                                            <p id="analysis-velocity" class="text-lg font-bold text-slate-700">-</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase">Sprint Work Distribution</h4>
+                                        <div class="flex h-4 w-full bg-slate-100 rounded-full overflow-hidden" id="distribution-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                                <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-2">
+                                    <i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>
+                                    <h3 class="font-semibold text-slate-700">Effort by Priority</h3>
+                                </div>
+                                <div class="p-4 space-y-6" id="priority-tracker">
+                                    <!-- Priority bars injected via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boards Content -->
+                    <div id="view-boards" class="view-hidden space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h1 class="text-2xl font-bold text-slate-800">Sprint Backlog</h1>
+                            <div class="flex gap-2">
+                                <input id="new-task-input" type="text" placeholder="Add new work item..." class="px-4 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 md:w-80">
+                                <button onclick="addTask()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 font-medium">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="flex flex-col gap-4">
+                                <h3 class="font-bold text-slate-600 text-sm uppercase tracking-widest flex items-center gap-2 px-2">
+                                    <div class="w-2 h-2 rounded-full bg-slate-300"></div> TO DO <span id="count-todo" class="ml-1 text-slate-400 font-normal"></span>
+                                </h3>
+                                <div id="lane-todo" class="bg-slate-100/50 p-3 rounded-lg min-h-[400px] border border-dashed border-slate-200 space-y-3"></div>
+                            </div>
+                            <div class="flex flex-col gap-4">
+                                <h3 class="font-bold text-slate-600 text-sm uppercase tracking-widest flex items-center gap-2 px-2">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div> IN PROGRESS <span id="count-progress" class="ml-1 text-slate-400 font-normal"></span>
+                                </h3>
+                                <div id="lane-progress" class="bg-slate-100/50 p-3 rounded-lg min-h-[400px] border border-dashed border-slate-200 space-y-3"></div>
+                            </div>
+                            <div class="flex flex-col gap-4">
+                                <h3 class="font-bold text-slate-600 text-sm uppercase tracking-widest flex items-center gap-2 px-2">
+                                    <div class="w-2 h-2 rounded-full bg-green-500"></div> DONE <span id="count-done" class="ml-1 text-slate-400 font-normal"></span>
+                                </h3>
+                                <div id="lane-done" class="bg-slate-100/50 p-3 rounded-lg min-h-[400px] border border-dashed border-slate-200 space-y-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Content -->
+                    <div id="view-analytics" class="view-hidden space-y-6">
+                        <h1 class="text-2xl font-bold text-slate-800">Visual Analytics</h1>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-4">
+                                <h3 class="font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                                    <i data-lucide="pie-chart" class="w-4 h-4 text-blue-600"></i> Task Composition
+                                </h3>
+                                <div class="flex flex-col items-center py-4">
+                                    <div class="relative w-40 h-40 rounded-full border-[12px] border-slate-100 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <p id="pie-total" class="text-2xl font-black text-slate-800">0</p>
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tasks</p>
+                                        </div>
+                                        <svg class="absolute top-0 left-0 w-full h-full -rotate-90 overflow-visible" viewBox="0 0 100 100" id="pie-svg"></svg>
+                                    </div>
+                                    <div class="mt-8 grid grid-cols-2 gap-4 w-full" id="pie-legend"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-4">
+                                <h3 class="font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i> Sprint Velocity
+                                </h3>
+                                <div class="h-48 flex items-end justify-around px-2 border-b border-l border-slate-100" id="velocity-bars">
+                                    <!-- Bar graph injected via JS -->
+                                </div>
+                                <p class="mt-6 text-center text-[10px] text-slate-400 uppercase font-bold tracking-widest">Iterative Effort Progress</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA & STATE ---
+        let tasks = [
+            { id: 1, title: 'Initialize Git Repository', status: 'Done', priority: 'High', type: 'Setup', effort: 2 },
+            { id: 2, title: 'Configure CI/CD Pipeline', status: 'In Progress', priority: 'High', type: 'DevOps', effort: 8 },
+            { id: 3, title: 'UI Mockups for Dashboard', status: 'Done', priority: 'Medium', type: 'Design', effort: 5 },
+            { id: 4, title: 'API Authentication Layer', status: 'To Do', priority: 'High', type: 'Backend', effort: 13 },
+            { id: 5, title: 'Unit Testing Suite', status: 'To Do', priority: 'Low', type: 'Testing', effort: 5 },
+            { id: 6, title: 'Database Migration Scripts', status: 'In Progress', priority: 'Medium', type: 'Backend', effort: 3 },
+        ];
+
+        // --- AUTH LOGIC ---
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const authView = document.getElementById('auth-view');
+            const appView = document.getElementById('app-view');
+            
+            authView.classList.add('view-hidden');
+            appView.classList.remove('view-hidden');
+            
+            // Re-render dashboard on entry
+            renderDashboard();
+            lucide.createIcons();
+        });
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            // Hide all views
+            ['dashboard', 'boards', 'analytics'].forEach(id => {
+                document.getElementById(`view-${id}`).classList.add('view-hidden');
+                document.getElementById(`tab-${id}`).classList.remove('sidebar-item-active');
+                document.getElementById(`tab-${id}`).classList.add('text-slate-400', 'hover:bg-white/5');
+            });
+
+            // Show active view
+            document.getElementById(`view-${tabId}`).classList.remove('view-hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('sidebar-item-active');
+            document.getElementById(`tab-${tabId}`).classList.remove('text-slate-400', 'hover:bg-white/5');
+
+            if (tabId === 'dashboard') renderDashboard();
+            if (tabId === 'boards') renderBoards();
+            if (tabId === 'analytics') renderAnalytics();
+            
+            lucide.createIcons();
+        }
+
+        // --- TASK MANAGEMENT ---
+        function addTask() {
+            const input = document.getElementById('new-task-input');
+            const title = input.value.trim();
+            if (!title) return;
+
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                status: 'To Do',
+                priority: 'Medium',
+                type: 'Feature',
+                effort: 3
+            };
+            tasks.unshift(newTask);
+            input.value = '';
+            renderBoards();
+        }
+
+        function updateStatus(id, newStatus) {
+            const task = tasks.find(t => t.id == id);
+            if (task) task.status = newStatus;
+            renderBoards();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id != id);
+            renderBoards();
+        }
+
+        // --- RENDERING LOGIC ---
+
+        function renderDashboard() {
+            const stats = calculateStats();
+            const container = document.getElementById('stats-container');
+            
+            const statItems = [
+                { label: 'Work Items', val: stats.total, icon: 'list-todo', bg: 'bg-blue-50', color: 'text-blue-600' },
+                { label: 'Completion', val: `${stats.percent}%`, icon: 'check-circle-2', bg: 'bg-green-50', color: 'text-green-600' },
+                { label: 'Effort Points', val: stats.totalEffort, icon: 'activity', bg: 'bg-purple-50', color: 'text-purple-600' },
+                { label: 'Pending', val: stats.total - stats.done, icon: 'clock', bg: 'bg-orange-50', color: 'text-orange-600' }
+            ];
+
+            container.innerHTML = statItems.map(item => `
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 rounded-lg ${item.bg} ${item.color}">
+                        <i data-lucide="${item.icon}" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">${item.label}</p>
+                        <p class="text-2xl font-bold text-slate-800">${item.val}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Analysis
+            const feedback = document.getElementById('analysis-feedback');
+            const focus = document.getElementById('analysis-focus');
+            const velocity = document.getElementById('analysis-velocity');
+            
+            if (stats.percent > 70) feedback.innerText = '"Excellent progress! The sprint is on track for early completion."';
+            else if (stats.percent > 40) feedback.innerText = '"Steady progress. Focus on In Progress items to maintain velocity."';
+            else feedback.innerText = '"Velocity is lower than expected. Review blockers immediately."';
+
+            const types = Object.keys(stats.types);
+            focus.innerText = types.length ? (types.reduce((a, b) => stats.types[a] > stats.types[b] ? a : b) + ' Dev') : 'N/A';
+            velocity.innerText = `${stats.percent}%`;
+
+            // Distribution bar
+            const bar = document.getElementById('distribution-bar');
+            bar.innerHTML = Object.entries(stats.types).map(([type, count], i) => {
+                const colors = ['bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500', 'bg-slate-500'];
+                return `<div class="${colors[i % 5]} h-full" style="width: ${(count/stats.total)*100}%" title="${type}"></div>`;
+            }).join('');
+
+            // Priority Tracker
+            const prioContainer = document.getElementById('priority-tracker');
+            const priorities = ['High', 'Medium', 'Low'];
+            prioContainer.innerHTML = priorities.map(prio => {
+                const count = tasks.filter(t => t.priority === prio).length;
+                const perc = stats.total ? (count / stats.total) * 100 : 0;
+                const color = prio === 'High' ? 'bg-red-500' : prio === 'Medium' ? 'bg-orange-500' : 'bg-green-500';
+                return `
+                    <div>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                            <span>${prio.toUpperCase()} PRIORITY</span>
+                            <span>${count} items</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full ${color}" style="width: ${perc}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function renderBoards() {
+            const lanes = { 'To Do': 'lane-todo', 'In Progress': 'lane-progress', 'Done': 'lane-done' };
+            const counts = { 'To Do': 'count-todo', 'In Progress': 'count-progress', 'Done': 'count-done' };
+
+            Object.keys(lanes).forEach(status => {
+                const laneEl = document.getElementById(lanes[status]);
+                const countEl = document.getElementById(counts[status]);
+                const filtered = tasks.filter(t => t.status === status);
+                
+                countEl.innerText = `(${filtered.length})`;
+                laneEl.innerHTML = filtered.map(task => `
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:border-blue-400 transition-all group">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded uppercase ${task.priority === 'High' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}">
+                                ${task.type}
+                            </span>
+                            <div class="flex gap-1">
+                                <button onclick="deleteTask(${task.id})" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </div>
+                        <h4 class="text-sm font-semibold text-slate-800 mb-4">${task.title}</h4>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-5 h-5 bg-slate-200 rounded-full flex items-center justify-center text-[8px] font-bold text-slate-600">JD</div>
+                                <span class="text-[9px] text-slate-400 font-bold">${task.effort}pts</span>
+                            </div>
+                            <select onchange="updateStatus(${task.id}, this.value)" class="text-[9px] border-none bg-slate-50 rounded p-1 text-slate-500 font-bold focus:ring-0 outline-none">
+                                <option ${status === 'To Do' ? 'selected' : ''}>To Do</option>
+                                <option ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option ${status === 'Done' ? 'selected' : ''}>Done</option>
+                            </select>
+                        </div>
+                    </div>
+                `).join('');
+            });
+            lucide.createIcons();
+        }
+
+        function renderAnalytics() {
+            const stats = calculateStats();
+            document.getElementById('pie-total').innerText = stats.total;
+            
+            // Pie Chart SVG Generation
+            const svg = document.getElementById('pie-svg');
+            let offset = 0;
+            const colors = ['#3b82f6', '#8b5cf6', '#6366f1', '#f43f5e', '#64748b'];
+            
+            svg.innerHTML = Object.entries(stats.types).map(([type, count], i) => {
+                const slice = (count / stats.total) * 314;
+                const circle = `<circle cx="50" cy="50" r="50" fill="transparent" stroke="${colors[i % 5]}" stroke-width="12" stroke-dasharray="${slice} 314" stroke-dashoffset="-${offset}" />`;
+                offset += slice;
+                return circle;
+            }).join('');
+
+            const legend = document.getElementById('pie-legend');
+            legend.innerHTML = Object.entries(stats.types).map(([type, count], i) => `
+                <div class="flex items-center justify-between text-[11px]">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-sm" style="background: ${colors[i % 5]}"></div>
+                        <span class="text-slate-600">${type}</span>
+                    </div>
+                    <span class="font-bold text-slate-800">${count}</span>
+                </div>
+            `).join('');
+
+            // Velocity Bars
+            const velocity = document.getElementById('velocity-bars');
+            const data = [12, 18, 15, 24, stats.completedEffort];
+            velocity.innerHTML = data.map((val, i) => `
+                <div class="flex flex-col items-center w-full group">
+                    <div class="text-[9px] font-bold text-slate-400 mb-1 opacity-0 group-hover:opacity-100">${val}pts</div>
+                    <div class="w-6 rounded-t transition-all duration-700 ${i === 4 ? 'bg-blue-500' : 'bg-slate-200'}" style="height: ${(val/30)*100}%"></div>
+                    <div class="text-[9px] font-bold text-slate-500 mt-2">S${i+1}</div>
+                </div>
+            `).join('');
+        }
+
+        function calculateStats() {
+            const total = tasks.length;
+            const done = tasks.filter(t => t.status === 'Done').length;
+            const totalEffort = tasks.reduce((a, b) => a + b.effort, 0);
+            const completedEffort = tasks.filter(t => t.status === 'Done').reduce((a, b) => a + b.effort, 0);
+            const types = tasks.reduce((acc, curr) => {
+                acc[curr.type] = (acc[curr.type] || 0) + 1;
+                return acc;
+            }, {});
+            return { total, done, percent: total ? Math.round((done/total)*100) : 0, totalEffort, completedEffort, types };
+        }
+
+        // Init icons on load
+        window.onload = () => {
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
