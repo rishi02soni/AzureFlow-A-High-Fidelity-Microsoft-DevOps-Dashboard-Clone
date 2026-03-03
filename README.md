@@ -1,7 +1,7 @@
 # 🚀 AzureFlow  
 ### A High-Fidelity Microsoft DevOps Dashboard Clone
 
-![AzureFlow Banner](https://media.giphy.com/media/coxQHKASG60HrHtvkt/giphy.gif)
+![AzureFlow Banner](https://cdn.dribbble.com/userupload/20595902/file/original-01f2711095348bbdd52f0fbaac2be9e3.gif)
 
 > A fully functional, enterprise-grade Azure DevOps-inspired dashboard built from scratch.
 
